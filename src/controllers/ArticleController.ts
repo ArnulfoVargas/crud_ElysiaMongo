@@ -77,13 +77,14 @@ export const UpdateArticle = async(ctx : Context) => {
 };
 
 export const GetArticles = async(ctx : Context) => {
-  const limit = parseInt(ctx.query["limit"] ?? '3');
-  const offset = parseInt(ctx.query["offset"] ?? '0');
+  const limit : number = parseInt(ctx.query["limit"] ?? "") ?? 3;
+  const offset : number = parseInt(ctx.query["offset"] ?? "") ?? 0;
+
   const articles = await Article
     .find({})
     .sort({date: -1})
     .skip(offset) // offset in sql
-    .limit(+limit) 
+    .limit(limit) 
     .exec();
 
   return articles;
@@ -127,6 +128,40 @@ export const DeleteOneArticle = async (ctx : Context) => {
     return {
       error: true,
       error_desc: "Error deleting article"
+    } as ResponseDTO;
+  }
+}
+
+export const UploadFile = async (ctx : Context) => {
+  interface Req {
+    file : Blob
+  }
+
+  const body : Req = ctx.body as Req;
+  const params : string = ctx.params["id"];
+
+  const baseDir = Bun.main.replace("src\\index.ts", "images\\");
+  const dir = `${baseDir}${Date.now()}_${body.file.name}`;
+
+  try {
+    await Bun.write(dir, body.file);
+  } catch (err) {
+    return {
+      error: true,
+      error_desc: "Error while storing image"
+    } as ResponseDTO;
+  }
+
+  try {
+    const article = await Article.findOneAndUpdate({_id:params}, {image: dir}, {new: true}).exec();
+    return {
+      error: false,
+      data: article
+    } as ResponseDTO;
+  } catch (err) {
+    return {
+      error: true,
+      error_desc: "Error updating data"
     } as ResponseDTO;
   }
 }
