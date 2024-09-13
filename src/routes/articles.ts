@@ -16,7 +16,7 @@ export const articleRouter : Elysia = new Elysia()
     .post("/upload/:id", UploadFile, {
       params: t.Object({id: t.String()}),
       body: t.Object({
-        file: t.File()
+        file: t.File({type: "image"})
       })
     })
 

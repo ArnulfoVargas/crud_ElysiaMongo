@@ -1,6 +1,7 @@
 import {Context} from "elysia"
 import ResponseDTO from "../dto/responseDto";
 import { Article } from "../models/ArticleModel";
+import { unlink } from "node:fs/promises";
 import * as validator from "validator";
 
 export const CreateArticle = async (ctx : Context) => {
@@ -145,6 +146,12 @@ export const UploadFile = async (ctx : Context) => {
 
   try {
     await Bun.write(dir, body.file);
+    const article = await Article.findById(params)
+     
+    if (article && article.image)
+    {
+      await unlink(article.image);
+    } else throw new Error();
   } catch (err) {
     return {
       error: true,
