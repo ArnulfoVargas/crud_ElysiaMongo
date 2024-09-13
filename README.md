@@ -1,15 +1,16 @@
-# Elysia with Bun runtime
+## Sample api
 
-## Getting Started
-To get started with this template, simply paste this command into your terminal:
-```bash
-bun create elysia ./elysia-example
+# Description
+This app was made for learning purpuses, it just simulates a basic blog api with not many features
+
+# How to run?
+- You may have installed Bun
+- Then in the root folder 
+```
+$ bun intall
+$ bun run dev
 ```
 
-## Development
-To start the development server run:
-```bash
-bun run dev
-```
+I used the Swagger plugin, so for more usage information you can search for:
 
-Open http://localhost:3000/ with your browser to see the result.
+localhost:<your-port>/api/swagger
