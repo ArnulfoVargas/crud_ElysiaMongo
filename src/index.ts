@@ -11,7 +11,6 @@ const port : string = process.env.PORT ?? "8080";
 new Elysia({prefix:"/api"})
   .use(swagger())
   .use(cors())
-  .get("/hello", () => "test")
   .use(articleRouter)
   .listen(port, () => {
   console.log("Listening on port " + port)
