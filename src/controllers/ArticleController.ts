@@ -142,7 +142,8 @@ export const UploadFile = async (ctx : Context) => {
   const params : string = ctx.params["id"];
 
   const baseDir = Bun.main.replace("src\\index.ts", "images\\");
-  const dir = `${baseDir}${Date.now()}_${body.file.name}`;
+  const fileName = `${Date.now()}_${body.file.name}`
+  const dir = baseDir + fileName;
 
   try {
     await Bun.write(dir, body.file);
@@ -160,7 +161,7 @@ export const UploadFile = async (ctx : Context) => {
   }
 
   try {
-    const article = await Article.findOneAndUpdate({_id:params}, {image: dir}, {new: true}).exec();
+    const article = await Article.findOneAndUpdate({_id:params}, {image: fileName}, {new: true}).exec();
     return {
       error: false,
       data: article
@@ -169,6 +170,57 @@ export const UploadFile = async (ctx : Context) => {
     return {
       error: true,
       error_desc: "Error updating data"
+    } as ResponseDTO;
+  }
+}
+
+export const GetFile = async(ctx : Context) => {
+  const fileName = ctx.params["filename"];
+  const baseDir = Bun.main.replace("src\\index.ts", "images\\");
+  const dir = baseDir + fileName;
+
+  try {
+    const file = Bun.file(dir);
+    const exists = await file.exists();
+    if (!exists) throw new Error()
+
+    return file;
+  } catch(err) {
+    return {
+      error: true, 
+      error_desc: "File doesnt exists"
+    } as ResponseDTO;
+  }
+}
+
+export const SearchArticle = async(ctx : Context) => {
+  const query = ctx.query["q"];
+
+  try {
+    const articles = await Article.find({"$or" : [{
+          "title" : { 
+            "$regex" : query, 
+            "$options": "i"
+          }
+        }, {
+          "content" : {
+            "$regex" : query,
+            "$options" : "i"
+          }
+        }
+      ]
+    }).sort({date: -1}).exec();
+
+    if (!articles) throw new Error();
+
+    return {
+      error: false,
+      data: articles
+    } as ResponseDTO;
+  } catch (err) {
+    return {
+      error: true,
+      error_desc: "Couldnt get"
     } as ResponseDTO;
   }
 }
