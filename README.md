@@ -13,4 +13,4 @@ $ bun run dev
 
 I used the Swagger plugin, so for more usage information you can search for:
 
-localhost:<your-port>/api/swagger
+localhost:your-port/api/swagger
